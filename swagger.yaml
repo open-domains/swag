@@ -170,6 +170,98 @@ paths:
                     type: string
                     example: "Domain not found"
 
+  /oauth/token:
+    post:
+      summary: Obtain access token
+      description: |
+        Obtain an access token by providing a username and password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: user123
+                password:
+                  type: string
+                  example: password123
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized"
+
+  /oauth/google:
+    get:
+      summary: Redirect to Google OAuth
+      description: |
+        Initiate the Google OAuth flow for user authentication.
+      responses:
+        '302':
+          description: Redirect to Google
+          headers:
+            Location:
+              description: URL to Google OAuth page
+              schema:
+                type: string
+
+  /oauth/github:
+    get:
+      summary: Redirect to GitHub OAuth
+      description: |
+        Initiate the GitHub OAuth flow for user authentication.
+      responses:
+        '302':
+          description: Redirect to GitHub
+          headers:
+            Location:
+              description: URL to GitHub OAuth page
+              schema:
+                type: string
+
+  /oauth/social/callback:
+    get:
+      summary: Social OAuth Callback
+      description: |
+        Callback URL for handling the response from social OAuth providers.
+      parameters:
+        - in: query
+          name: code
+          required: true
+          description: Authorization code or token
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Callback successful"
+
 components:
   securitySchemes:
     apiKeyAuth:
