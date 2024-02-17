@@ -6,18 +6,22 @@ info:
 servers:
   - url: https://api.open-domains.net
 paths:
-  /check:
-    get:
-      summary: Check if a domain exists
+  /login:
+    post:
+      summary: Login user
       description: |
-        Check if a domain exists.
-      parameters:
-        - in: query
-          name: domain
-          required: true
-          description: Domain to check
-          schema:
-            type: string
+        Authenticate a user using username and password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
       responses:
         '200':
           description: Successful response
@@ -26,25 +30,62 @@ paths:
               schema:
                 type: object
                 properties:
-                  exists:
-                    type: boolean
-                    example: true
-        '400':
-          description: Bad request
+                  accessToken:
+                    type: string
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  error:
+                  message:
                     type: string
-                    example: "Invalid domain"
-
-  /user/domains:
-    get:
-      summary: List all domains on account
+                    example: "Invalid credentials"
+  /register:
+    post:
+      summary: Register user
       description: |
-        Retrieve a list of all domains associated with the user's account.
+        Register a new user with username, password, and email.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                email:
+                  type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User registered!"
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User already exists!"
+  /domains:
+    get:
+      summary: Domain Management
+      description: |
+        Endpoints for managing domains.
       security:
         - apiKeyAuth: []
       responses:
@@ -67,10 +108,8 @@ paths:
                   error:
                     type: string
                     example: "Unauthorized"
-
-  /domain:
     post:
-      summary: Create a new domain
+      summary: Create Domain
       description: |
         Create a new domain and associate it with the user's account.
       requestBody:
@@ -124,9 +163,9 @@ paths:
                     type: string
                     example: "Unauthorized"
 
-  /domain/{domain}/delete:
+  /domains/{domain}:
     delete:
-      summary: Delete a domain
+      summary: Delete Domain
       description: |
         Delete a domain from the account.
       parameters:
@@ -170,9 +209,43 @@ paths:
                     type: string
                     example: "Domain not found"
 
-  /oauth/token:
+  /domains/check:
+    get:
+      summary: Check Domain Existence
+      description: |
+        Check if a domain exists.
+      parameters:
+        - in: query
+          name: domain
+          required: true
+          description: Domain to check
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exists:
+                    type: boolean
+                    example: true
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid domain"
+
+  /oauth:
     post:
-      summary: Obtain access token
+      summary: Obtain Access Token
       description: |
         Obtain an access token by providing a username and password.
       requestBody:
@@ -212,7 +285,7 @@ paths:
 
   /oauth/google:
     get:
-      summary: Redirect to Google OAuth
+      summary: Google OAuth Redirect
       description: |
         Initiate the Google OAuth flow for user authentication.
       responses:
@@ -226,7 +299,7 @@ paths:
 
   /oauth/github:
     get:
-      summary: Redirect to GitHub OAuth
+      summary: GitHub OAuth Redirect
       description: |
         Initiate the GitHub OAuth flow for user authentication.
       responses:
