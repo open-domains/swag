@@ -6,42 +6,6 @@ info:
 servers:
   - url: https://api.open-domains.net
 paths:
-  /login:
-    post:
-      summary: Login user
-      description: |
-        Authenticate a user using username and password.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                password:
-                  type: string
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  accessToken:
-                    type: string
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Invalid credentials"
   /register:
     post:
       summary: Register user
@@ -81,11 +45,47 @@ paths:
                   message:
                     type: string
                     example: "User already exists!"
-  /domains:
-    get:
-      summary: Domain Management
+  /login:
+    post:
+      summary: Login user
       description: |
-        Endpoints for managing domains.
+        Authenticate a user using username and password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid credentials"
+  /profile:
+    get:
+      summary: User info
+      description: |
+        Displays user info.
       security:
         - apiKeyAuth: []
       responses:
@@ -108,232 +108,8 @@ paths:
                   error:
                     type: string
                     example: "Unauthorized"
-    post:
-      summary: Create Domain
-      description: |
-        Create a new domain and associate it with the user's account.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                domain:
-                  type: string
-                  example: example.com
-                recordType:
-                  type: string
-                  enum: [A, AAAA, CNAME, MX, TXT]
-                  example: A
-                recordData:
-                  type: string
-                  example: "127.0.0.1"
-      security:
-        - apiKeyAuth: []
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Domain example.com created successfully"
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Domain already exists"
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Unauthorized"
-
-  /domains/{domain}:
-    delete:
-      summary: Delete Domain
-      description: |
-        Delete a domain from the account.
-      parameters:
-        - in: path
-          name: domain
-          required: true
-          description: Domain to delete
-          schema:
-            type: string
-      security:
-        - apiKeyAuth: []
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Domain example.com deleted successfully"
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Unauthorized"
-        '404':
-          description: Domain not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Domain not found"
-
-  /domains/check:
-    get:
-      summary: Check Domain Existence
-      description: |
-        Check if a domain exists.
-      parameters:
-        - in: query
-          name: domain
-          required: true
-          description: Domain to check
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  exists:
-                    type: boolean
-                    example: true
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Invalid domain"
-
-  /oauth:
-    post:
-      summary: Obtain Access Token
-      description: |
-        Obtain an access token by providing a username and password.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                  example: user123
-                password:
-                  type: string
-                  example: password123
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  access_token:
-                    type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Unauthorized"
-
-  /oauth/google:
-    get:
-      summary: Google OAuth Redirect
-      description: |
-        Initiate the Google OAuth flow for user authentication.
-      responses:
-        '302':
-          description: Redirect to Google
-          headers:
-            Location:
-              description: URL to Google OAuth page
-              schema:
-                type: string
-
-  /oauth/github:
-    get:
-      summary: GitHub OAuth Redirect
-      description: |
-        Initiate the GitHub OAuth flow for user authentication.
-      responses:
-        '302':
-          description: Redirect to GitHub
-          headers:
-            Location:
-              description: URL to GitHub OAuth page
-              schema:
-                type: string
-
-  /oauth/social/callback:
-    get:
-      summary: Social OAuth Callback
-      description: |
-        Callback URL for handling the response from social OAuth providers.
-      parameters:
-        - in: query
-          name: code
-          required: true
-          description: Authorization code or token
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Callback successful"
+  
+  
 
 components:
   securitySchemes:
